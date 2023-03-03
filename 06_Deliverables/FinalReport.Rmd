@@ -1,0 +1,85 @@
+---
+title: "MSiA 401: Mini Project - Group 6"
+author:
+- Alejandra Lelo de Larrea Ibarra
+- Kiran Jyothi Sheena
+- Lixuan Chen
+- Wencheng Zhang
+geometry: left=2cm,right=2cm,top=1.5cm,bottom=1.5cm
+output:
+  pdf_document:
+    toc: yes
+    number_sections: yes
+    toc_depth: 3
+bibliography: References.bib
+nocite: '@*'
+biblio-style: apa
+header-includes:
+- \usepackage{amssymb, amsfonts, amsmath, amsthm, bbm, pdfpages}
+- \allowdisplaybreaks
+abstract: "HERE GOES THE ABSTRACT" 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Introduction 
+
+This is a way to cite papers [@wirth2000crisp].
+
+# Data 
+
+## Original Data
+
+## EDA 
+
+<!--KIRAN'S-->
+
+<!--ELEN'S -->
+
+<!--WENCHENG'S  -->
+
+<!--ALE'S-->
+
+## Data Cleaning \& Feature Engineering 
+
+<!--KIRAN'S-->
+
+<!--ELEN'S -->
+
+<!--WENCHENG'S  -->
+
+<!--ALE'S-->
+
+## Final Data Set Description 
+
+# Modelling
+
+## Train, Test \& Cross Validation
+
+## Naive Bayes (benchmark)
+
+## Logistic Regression
+
+## Neural Networks
+
+## Tree 
+
+## Nearest Neighboors
+
+## Local Logistic Regression
+
+## Weighted Kernel 
+
+## Boosting 
+
+## Random Forest
+
+## Support Vector Machines
+
+# Model Comparison 
+
+# Final Considerations 
+
+# References
