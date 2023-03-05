@@ -12,15 +12,14 @@ output:
     number_sections: yes
     toc_depth: 3
 bibliography: References.bib
-nocite: '@*'
 biblio-style: apa
 header-includes:
-- \usepackage{amssymb, amsfonts, amsmath, amsthm, bbm, pdfpages, natbib}
+- \usepackage{amssymb, amsfonts, amsmath, amsthm, bbm, pdfpages}
 - \allowdisplaybreaks
 - \renewcommand{\abstractname}{Executive Summary}
 link-citations: yes
 linkcolor: blue
-abstract: "HERE GOES THE EXECUTIVE SUMMARY" 
+abstract: 'HERE GOES THE EXECUTIVE SUMMARY' 
 ---
 
 ```{r setup, include=FALSE}
@@ -33,13 +32,13 @@ Smith Travel Research estimates there are 17.5 million guestrooms in 187,000 hot
 
 Accurately forecasting hotel booking cancellations and understanding the factors that influence such behavior is relevant for the following XXX reasons. First, from an economic perspective, each unoccupied room results in an economic loss for the hotel. If accurately and timely forecasted, the hotel could still allocate the room to a different customer and avoid loosing revenue. Additionally, this would help the hotel to understand their net demand. Second, from the operational side of the business, managing cancellations is costly both in time and resources. For example, during peak seasons the hotel might need to allocate additional resources to manage cancellations and to try to reallocate the rooms. An accurate forecast could help to reduce operational costs and improve the hotel's efficiency. Third, from a marketing perspective, forecasting booking cancellations opens the possibility to implement pricing strategies, such as offering discounts to retain the customer. \textcolor{red}{LIST ANY OTHER POSSIBLE REASONS WHY THIS PROBLEM MIGHT BE IMPORTANT.}
 
-Hotel booking cancellations and revenue management has been widely studied in the literature. [@antonio2019big] use data from eight hotels combined with additional sources (such as weather or holidays) to develop booking cancellation prediction models to help hoteliers understand their net demand and improve their revenue management. [@chen2011search] use a multinomial logit regression to analyze the impact of cancellation fees and deadlines on hotel bookings and find that the former affects customer's behavior but the later doesn't. [@falk2018modelling] uses data of 9 hotels to estimate a probit model with cluster adjusted standard errors at the hotel level to find the determinants of cancellation probability, among which booking lead time and country of residence are the most important. [@sanchez2020using] apply ML algorithms to forecast hotel booking cancellations using genetic algorithms to configure the structural parameters of the artificial neural network used. 
+Hotel booking cancellations and revenue management has been widely studied in the literature. [@antonio2019big] use data from eight hotels combined with additional sources (such as weather or holidays) to develop booking cancellation prediction models to help hoteliers understand their net demand and improve their revenue management. [@chen2011search] use a multinomial logit regression to analyze the impact of cancellation fees and deadlines on hotel bookings and find that the former affects customer's behavior but the later doesn't. [@falk2018modelling] uses data of 9 hotels to estimate a probit model with cluster adjusted standard errors at the hotel level to find the determinants of cancellation probability, among which booking lead time and country of residence are the most important. [@sanchez2020using] apply ML algorithms to forecast hotel booking cancellations using genetic algorithms to configure the structural parameters of the artificial neural network used.
 
 In this regard, we contribute to the study of hotel booking cancellations by analyzing the \textit{Hotel booking demand} data set available in [Kagle](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand)^[Data set retrieve on January 18th 2023 at https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand.] with the aim of forecasting hotel booking cancellations through the lens of Machine Learning (ML) models. This data set contains \textcolor{red}{119,388} booking registries of a resort hotel and a city hotel from a chain in Portugal and includes information such as date of the booking, length of stay, number of children and adults, type of meal, number of special requests, among others. To forecast cancellations, we first do an exploratory data analysis to understand the data set and the relations between the predictors and the response. Then we clean the data, select the main features and apply some transformations, as well as create new features. Then we fit several ML classification models to the final data set. For this process, we randomly split the data in training (\textcolor{red}{XXX} observations) and test (\textcolor{red}{XXXX} observations). Specifically, we estimate a Naive Bayes classifier (benchmark), Logistic Regression, Neural Network, Tree, k-Nearest Neighboors, Local Logistic Regression, Weighted Kernel, Boosting, Random Forest and Support Vector Machines. For each of this models, we use 10-fold cross validation (CV) for hyperparameter tuning. Note that each model was run independently in this step. After finding the optimal hyperparameters, we apply again 10-fold cross validation to compare the optimal models. Finally, we evaluate the model performance in the test set. To compare models we use the miss-classification rate, the AUC measure and the F1-score. We find that the benchmark model (Naive Bayes) has a \textcolor{red}{DESCRIBE RESULTS HERE...}.
 
 The rest of the report is structured as follows. Section \ref{Sec:Data} presents the original data, exploratory data analysis, data cleaning and feature engineering strategy, and details the final data set to be used. Then, Section \ref{Sec:Modelling} succinctly presents each of the ML models selected to fit the data and the evaluation process. After this, Section \ref{Sec:Comparison} compares the forecasting power of each model. Lastly, Section \ref{Sec:Remarks} presents our final remarks.
 
-\textcolor{red}{THIS IS A WAY TO ADD COLOR TO TEXT FOR SPECIAL COMMENTS. ALSO HERE IS A GUIDE TO CITE PAPERS OR REFERENCES IF NEEED: [$@$ key]. DO NOT FORGET TO ADD YOUR REFERNCES TO THE .BIB FILE. EXAMPLE: [$@$WIRTH2000crips] GENERATES THE FOLLOWING CITATION:} [@wirth2000crisp] \textcolor{red}{ WE SHOULD REMOVE THIS LINE IN THE END.} 
+\textcolor{red}{THIS IS A WAY TO ADD COLOR TO TEXT FOR SPECIAL COMMENTS. ALSO HERE IS A GUIDE TO CITE PAPERS OR REFERENCES IF NEEED: [$@$ key]. DO NOT FORGET TO ADD YOUR REFERNCES TO THE .BIB FILE. EXAMPLE: [WIRTH2000crips] GENERATES THE FOLLOWING CITATION:} [@wirth2000crisp] \textcolor{red}{ WE SHOULD REMOVE THIS LINE IN THE END.} 
 
 # Data \label{Sec:Data}
 
@@ -97,5 +96,3 @@ The rest of the report is structured as follows. Section \ref{Sec:Data} presents
 # Final Remarks\label{Sec:Remarks}
 
 # References
-
-
