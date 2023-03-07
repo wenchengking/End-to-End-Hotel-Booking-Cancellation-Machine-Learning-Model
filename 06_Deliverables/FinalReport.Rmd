@@ -214,6 +214,8 @@ $>$20 & 46 \\
 
 <!--KIRAN'S-->
 
+From our initial EDA, we have noticed a skewed distribution of the variable lead_time and hence we log transform it. The arrival month variable was converted to the corresponding month number instead of the month name. We also create a total_nights variable combining the number of nights a party had stayed on the weekends and weekdays, as it provided a more logical comparison among data points. 
+
 <!--ELEN'S -->
 
 <!--WENCHENG'S  -->
@@ -226,19 +228,136 @@ $>$20 & 46 \\
 
 ## Train, Test \& Cross Validation
 
+<<<<<<< HEAD
 To be able to buld and test the predictive power of the different models, we randomly divided the data into train and test sets making sure to keep the proportion of cancellations in both of them. The train set has 95,511 observations and the test set has a total of 23,877 observations. For each model, we use 10-fold cross validation to find the optimal hyperparameters (if needed), we then retrain the optimal model using the entire training set and asses its predictive power using the test set. To assess the effectiveness of each model, we used accuracy, F-1 score, AUC score and ROC.
 
+||||||| 3c764bf
+=======
+In order to evaluate our models, we have split the data into a train and test set. We have randomly samples 80% of our data and stored the indexes of the rows obtained. These indexes were then used to derive the train and test set for each of our models to ensure that the model's predictive power is evaluated over the same set of data. The accuracy of the model on the test set is chosen as the parameter over which the models are analyzed. 
+
+To find the optimum hyperparameters for each type of supervised model, we would be performing k-fold cross validation on the training data. It would be implemented in python using the GridSearchCV method from the sklearn.model_selection module. The method iterates over the different combination of the chosen parameters, performs the cross validation and obtains the optimum combination based on the evaluation metric, which in this case is accuracy. The combination of the parameters which produces the maximum accuracy on the holdout sets for each model would be considered as the final version. 
+
+>>>>>>> 3fa3fca2b664c40a19c6e37bc069797bddbfe740
 ## Naive Bayes (benchmark)
 
 ## Logistic Regression
 
 ## Neural Networks
 
+The MLPClassifier from the sklearn.neural_network package was used to create the different neural network models. It creates a single layer perceptron with regularization.  Before fitting a neural network model, the numerical features were standardized as the magnitude of the features could affect the final weights. The hyperparameters which we consider for tuning are the regularizarion parameter - alpha, the learning rate and the number of hidden layer neurons.
+
+The first set of values considered for the parameters are alpha = [0.0001,0.001,0.1], learning_rate = [0.001,0.01,0.1] and hidden_layer_size = [10,20,30]. On performing 5-fold cross validation, alpha=0.001,hidden_layer_size = 30 and learning_rate = 0.001 proved to be the best combination with a cross validation accuracy of 86.5%. Analyzing the performance of different combinations, we have noticed that models with higher number of neurons performed better keeping the other parameters constant. The learning rate did not have a significant impact on determining the accuracy. 
+
+Hence we ran a second set of hyperparameter tuning with alpha = [0.0001,0.001,0.1] and hidden_layer_size = [30,40,50]. Learning_rate was fixed at the value of 0.001. As expected, the optimum model had hidden_layer_size = 50 and alpha=0.001 with a cross validation accuracy of 86.8%. Increasing the number of neurons thereafter did not showcase a significant improvement in accuracy. The final model was fit using the entire training data with a test accuracy of 86.1%. and the ALE plots were constructed for the final model.
+
+![ALE plots for final neural network](../06_Deliverables/NN_ALE.png)
+
+By observing the ALE plots, we can observe that most numerical features have an almost linear relationship with the predictor variable.log_adr has a non-linear increaseing effect on the probability of cancellation and total_of_special_requests has a decreaseing non-linear effect.
+
+The predictors babies, children and arrival_date_year do not seem to have a significant effect on the final value looking at the range of y-values. Thus we can consider removing them. log_days_in_w
+aiting_list and booking_changes have a low range as well but booking changes seem to have a non-linear relationship and log_days_in_waiting_list have closer ticks, which might be important. So we keep these columns. However removing the features from the data caused a decrease in test accuracy and hence all features were considered in our final model.
+
 ## Tree 
 
 ## Nearest Neighboors
 
-## Local Logistic Regression
+## GAM
+
+Before we try fitting a GAM model, we have to convert all categorical variables into factors. The variables children, babies and market segment had too many factors due to which the GAM model was not able to fit the data on cross validation and test data set. Hence they were not considered for our analysis. The feature arrival_date_year evnthough should be considered as a continuous variable, it could not be introduced as one due to less number of distinct values in the data. Hence it was also not considered in the GAM model. The variables adults, previous_cancellations, booking_changes, log_lead_time,total_nights,previous_bookings,log_days_in_waiting_list and log_adr are to treated as smoothened features in the GAM model. The feature values were standardised before introducing the dataset into the model.
+
+The results from the initial model is as follows
+
+Parametric coefficients:
+                               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                  -3.323e-01  1.544e-01  -2.153 0.031353 *  
+hotelResort Hotel             1.730e-01  2.722e-02   6.358 2.05e-10 ***
+mealFB                       -4.573e-01  1.301e-01  -3.514 0.000441 ***
+mealHB                       -4.730e-01  3.236e-02 -14.616  < 2e-16 ***
+mealSC                        6.172e-01  3.012e-02  20.490  < 2e-16 ***
+mealUndefined                -1.351e+00  1.244e-01 -10.856  < 2e-16 ***
+is_repeated_guest1           -7.670e-01  1.385e-01  -5.538 3.06e-08 ***
+deposit_typeNon Refund        4.016e+00  1.292e-01  31.077  < 2e-16 ***
+deposit_typeRefundable        3.694e-01  2.703e-01   1.367 0.171720    
+customer_typeGroup           -4.575e-02  2.251e-01  -0.203 0.838936    
+customer_typeTransient        1.348e+00  7.062e-02  19.088  < 2e-16 ***
+customer_typeTransient-Party  1.571e-01  7.416e-02   2.118 0.034151 *  
+total_of_special_requests1   -1.029e+00  2.213e-02 -46.491  < 2e-16 ***
+total_of_special_requests2   -1.094e+00  3.100e-02 -35.285  < 2e-16 ***
+total_of_special_requests3   -1.429e+00  6.856e-02 -20.847  < 2e-16 ***
+total_of_special_requests4   -2.217e+00  2.180e-01 -10.170  < 2e-16 ***
+total_of_special_requests5   -3.261e+00  1.059e+00  -3.078 0.002081 ** 
+arrival_month2               -4.257e-02  5.803e-02  -0.733 0.463260    
+arrival_month3               -4.097e-01  5.662e-02  -7.235 4.64e-13 ***
+arrival_month4               -4.117e-01  5.626e-02  -7.317 2.53e-13 ***
+arrival_month5               -6.620e-01  5.662e-02 -11.691  < 2e-16 ***
+arrival_month6               -8.053e-01  5.785e-02 -13.919  < 2e-16 ***
+arrival_month7               -9.894e-01  5.728e-02 -17.274  < 2e-16 ***
+arrival_month8               -7.780e-01  5.743e-02 -13.549  < 2e-16 ***
+arrival_month9               -9.034e-01  5.988e-02 -15.087  < 2e-16 ***
+arrival_month10              -5.542e-01  5.760e-02  -9.621  < 2e-16 ***
+arrival_month11              -3.231e-01  6.165e-02  -5.241 1.60e-07 ***
+arrival_month12              -2.016e-01  6.142e-02  -3.282 0.001030 ** 
+domesticinternational        -1.827e+00  2.425e-02 -75.326  < 2e-16 ***
+continentAmericas            -1.007e+00  9.638e-02 -10.451  < 2e-16 ***
+continentAntarctica          -9.882e+01  6.711e+07   0.000 0.999999    
+continentAsia                -8.092e-01  9.681e-02  -8.358  < 2e-16 ***
+continentEurope              -1.477e+00  8.873e-02 -16.646  < 2e-16 ***
+continentOceania             -1.518e+00  1.584e-01  -9.583  < 2e-16 ***
+continentunknown             -6.388e-01  2.834e-01  -2.254 0.024183 *  
+got_room_booked1              1.854e+00  4.669e-02  39.711  < 2e-16 ***
+booked_by_agentyes            4.129e-01  4.517e-02   9.141  < 2e-16 ***
+booked_by_company1           -2.063e-01  7.064e-02  -2.920 0.003501 ** 
+required_car_parking1        -8.766e+01  8.697e+05   0.000 0.999920 
+
+We can notice that atleast one variables related to any categorical feature is significant except for required_car_parking. We could try removing it from the dataset. We obtain the following set of coefficients.
+
+(Intercept)                  -4.988e-01  1.529e-01  -3.263  0.00110 ** 
+hotelResort Hotel            -6.275e-02  2.602e-02  -2.412  0.01588 *  
+mealFB                       -4.798e-01  1.225e-01  -3.917 8.98e-05 ***
+mealHB                       -4.211e-01  3.133e-02 -13.438  < 2e-16 ***
+mealSC                        6.162e-01  2.979e-02  20.689  < 2e-16 ***
+mealUndefined                -1.157e+00  1.217e-01  -9.504  < 2e-16 ***
+is_repeated_guest1           -7.999e-01  1.360e-01  -5.882 4.05e-09 ***
+deposit_typeNon Refund        4.125e+00  1.285e-01  32.110  < 2e-16 ***
+deposit_typeRefundable        4.622e-01  2.647e-01   1.746  0.08081 .  
+customer_typeGroup           -3.991e-02  2.214e-01  -0.180  0.85690    
+customer_typeTransient        1.273e+00  6.986e-02  18.225  < 2e-16 ***
+customer_typeTransient-Party  1.616e-01  7.338e-02   2.202  0.02765 *  
+total_of_special_requests1   -1.017e+00  2.158e-02 -47.140  < 2e-16 ***
+total_of_special_requests2   -1.081e+00  3.023e-02 -35.755  < 2e-16 ***
+total_of_special_requests3   -1.422e+00  6.696e-02 -21.237  < 2e-16 ***
+total_of_special_requests4   -2.184e+00  2.154e-01 -10.137  < 2e-16 ***
+total_of_special_requests5   -3.130e+00  1.045e+00  -2.995  0.00274 ** 
+arrival_month2               -9.557e-03  5.699e-02  -0.168  0.86682    
+arrival_month3               -3.811e-01  5.561e-02  -6.853 7.24e-12 ***
+arrival_month4               -3.539e-01  5.511e-02  -6.421 1.35e-10 ***
+arrival_month5               -5.695e-01  5.548e-02 -10.263  < 2e-16 ***
+arrival_month6               -7.421e-01  5.662e-02 -13.106  < 2e-16 ***
+arrival_month7               -9.265e-01  5.604e-02 -16.534  < 2e-16 ***
+arrival_month8               -7.100e-01  5.613e-02 -12.650  < 2e-16 ***
+arrival_month9               -8.481e-01  5.866e-02 -14.457  < 2e-16 ***
+arrival_month10              -5.013e-01  5.653e-02  -8.868  < 2e-16 ***
+arrival_month11              -2.897e-01  6.060e-02  -4.780 1.76e-06 ***
+arrival_month12              -1.885e-01  6.013e-02  -3.135  0.00172 ** 
+domesticinternational        -1.730e+00  2.331e-02 -74.221  < 2e-16 ***
+continentAmericas            -1.011e+00  9.444e-02 -10.708  < 2e-16 ***
+continentAntarctica          -6.867e+01  6.711e+07   0.000  1.00000    
+continentAsia                -7.946e-01  9.488e-02  -8.374  < 2e-16 ***
+continentEurope              -1.461e+00  8.694e-02 -16.807  < 2e-16 ***
+continentOceania             -1.503e+00  1.562e-01  -9.626  < 2e-16 ***
+continentunknown             -8.270e-01  2.702e-01  -3.061  0.00220 ** 
+got_room_booked1              1.865e+00  4.615e-02  40.413  < 2e-16 ***
+booked_by_agentyes            4.684e-01  4.374e-02  10.708  < 2e-16 ***
+booked_by_company1           -1.495e-01  6.925e-02  -2.158  0.03089 *
+
+
+We achieve a test set accuracy of 81.3% using this model. We can examine the component grpahs of the obtained GAM model.
+
+![Component Graph](/Users/kiranjyothisheena/Documents/Kiran_Files/PA2/Project/msia420_project/06_Deliverables/GAM_graph_1.png)
+
+The component graphs showcases some interesting insights. The effect of adults on the probability of cancellation is almost constant but the confidence interval of the effect gets wider as the number of adults increases. This implies the effect of adults is ambiguous. The same can be observed for the predictor previous_cancellations. A periodic pattern is also revealed on the impact of predictors such as booking_changes, previous_bookings, and log_adr on the probability of cancellation, where high values of these predictors alternate between increasing and decreasing the probability of cancellation at regular intervals.log_lead_time reveals to have a constant increasing effect on the cancellation probability. A increase in total_nights seem to showcase a decreasing trend at higher values but we have less number of points at that range to come to a conclusion.
+
+
 
 ## Weighted Kernel 
 
