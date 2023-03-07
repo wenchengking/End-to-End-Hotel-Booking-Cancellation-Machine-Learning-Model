@@ -14,7 +14,7 @@ output:
 bibliography: References.bib
 biblio-style: apa
 header-includes:
-- \usepackage{amssymb, amsfonts, amsmath, amsthm, bbm, pdfpages}
+- \usepackage{amssymb, amsfonts, amsmath, amsthm, bbm, pdfpages, tabularx}
 - \allowdisplaybreaks
 - \renewcommand{\abstractname}{Executive Summary}
 link-citations: yes
@@ -30,32 +30,187 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 Smith Travel Research estimates there are 17.5 million guestrooms in 187,000 hotels worldwide. In 2020, global hotel revenue was $198.6 billion dollars, and the hotel and tourism industry accounts for approximately 10\% of worldwide GDP [@hoteltechreport]. The hotel industry experiences approximately 24\% of cancellations on reservations, and this rate increases up to 38\% for online bookings [@mkttips]. With this figures, and specially after the Covid-19 Pandemic, the study of hotel booking cancellations has become more relevant.
 
-Accurately forecasting hotel booking cancellations and understanding the factors that influence such behavior is relevant for the following XXX reasons. First, from an economic perspective, each unoccupied room results in an economic loss for the hotel. If accurately and timely forecasted, the hotel could still allocate the room to a different customer and avoid loosing revenue. Additionally, this would help the hotel to understand their net demand. Second, from the operational side of the business, managing cancellations is costly both in time and resources. For example, during peak seasons the hotel might need to allocate additional resources to manage cancellations and to try to reallocate the rooms. An accurate forecast could help to reduce operational costs and improve the hotel's efficiency. Third, from a marketing perspective, forecasting booking cancellations opens the possibility to implement pricing strategies, such as offering discounts to retain the customer. \textcolor{red}{LIST ANY OTHER POSSIBLE REASONS WHY THIS PROBLEM MIGHT BE IMPORTANT.}
+Accurately forecasting hotel booking cancellations and understanding the factors that influence such behavior is relevant for the following XXX reasons. First, from an economic perspective, each unoccupied room results in an economic loss for the hotel. If accurately and timely forecasted, the hotel could still allocate the room to a different customer and avoid loosing revenue. Additionally, this would help the hotel to understand their net demand. Second, from the operational side of the business, managing cancellations is costly both in time and resources. For example, during peak seasons the hotel might need to allocate additional resources to manage cancellations and to try to reallocate the rooms. An accurate forecast could help to reduce operational costs and improve the hotel's efficiency. Third, from a marketing perspective, forecasting booking cancellations opens the possibility to implement pricing strategies, such as offering discounts to retain the customer.
 
 Hotel booking cancellations and revenue management has been widely studied in the literature. [@antonio2019big] use data from eight hotels combined with additional sources (such as weather or holidays) to develop booking cancellation prediction models to help hoteliers understand their net demand and improve their revenue management. [@chen2011search] use a multinomial logit regression to analyze the impact of cancellation fees and deadlines on hotel bookings and find that the former affects customer's behavior but the later doesn't. [@falk2018modelling] uses data of 9 hotels to estimate a probit model with cluster adjusted standard errors at the hotel level to find the determinants of cancellation probability, among which booking lead time and country of residence are the most important. [@sanchez2020using] apply ML algorithms to forecast hotel booking cancellations using genetic algorithms to configure the structural parameters of the artificial neural network used.
 
-In this regard, we contribute to the study of hotel booking cancellations by analyzing the \textit{Hotel booking demand} data set available in [Kagle](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand)^[Data set retrieve on January 18th 2023 at https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand.] with the aim of forecasting hotel booking cancellations through the lens of Machine Learning (ML) models. This data set contains \textcolor{red}{119,388} booking registries of a resort hotel and a city hotel from a chain in Portugal and includes information such as date of the booking, length of stay, number of children and adults, type of meal, number of special requests, among others. To forecast cancellations, we first do an exploratory data analysis to understand the data set and the relations between the predictors and the response. Then we clean the data, select the main features and apply some transformations, as well as create new features. Then we fit several ML classification models to the final data set. For this process, we randomly split the data in training (\textcolor{red}{XXX} observations) and test (\textcolor{red}{XXXX} observations). Specifically, we estimate a Naive Bayes classifier (benchmark), Logistic Regression, Neural Network, Tree, k-Nearest Neighboors, Local Logistic Regression, Weighted Kernel, Boosting, Random Forest and Support Vector Machines. For each of this models, we use 10-fold cross validation (CV) for hyperparameter tuning. Note that each model was run independently in this step. After finding the optimal hyperparameters, we apply again 10-fold cross validation to compare the optimal models. Finally, we evaluate the model performance in the test set. To compare models we use the miss-classification rate, the AUC measure and the F1-score. We find that the benchmark model (Naive Bayes) has a \textcolor{red}{DESCRIBE RESULTS HERE...}.
+In this regard, we contribute to the study of hotel booking cancellations by analyzing the \textit{Hotel booking demand} data set available in [Kagle](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand)^[Data set retrieve on January 18th 2023 at https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand.] with the aim of forecasting hotel booking cancellations through the lens of Machine Learning (ML) models. This data set contains 19,390 booking registries of a resort hotel and a city hotel from a chain in Portugal and includes 32 predictors such as date of the booking, length of stay, number of children and adults, type of meal, number of special requests, among others. To forecast cancellations, we first do an exploratory data analysis to understand the data set and the relations between the predictors and the response. Then we clean the data, select the main features and apply some transformations, as well as create new features. Then we fit several ML classification models to the final data set. For this process, we randomly split the data in training (\textcolor{red}{XXX} observations) and test (\textcolor{red}{XXXX} observations). Specifically, we estimate a Naive Bayes classifier (benchmark), Logistic Regression, Neural Network, Tree, k-Nearest Neighboors, Local Logistic Regression, Weighted Kernel, Boosting, Random Forest and Support Vector Machines. For each of this models, we use 10-fold cross validation (CV) for hyperparameter tuning. Note that each model was run independently in this step. After finding the optimal hyperparameters, we apply again 10-fold cross validation to compare the optimal models. Finally, we evaluate the model performance in the test set. To compare models we use the miss-classification rate, the AUC measure and the F1-score. We find that the benchmark model (Naive Bayes) has a \textcolor{red}{DESCRIBE RESULTS HERE...}.
 
 The rest of the report is structured as follows. Section \ref{Sec:Data} presents the original data, exploratory data analysis, data cleaning and feature engineering strategy, and details the final data set to be used. Then, Section \ref{Sec:Modelling} succinctly presents each of the ML models selected to fit the data and the evaluation process. After this, Section \ref{Sec:Comparison} compares the forecasting power of each model. Lastly, Section \ref{Sec:Remarks} presents our final remarks.
 
-\textcolor{red}{THIS IS A WAY TO ADD COLOR TO TEXT FOR SPECIAL COMMENTS. ALSO HERE IS A GUIDE TO CITE PAPERS OR REFERENCES IF NEEED: [$@$ key]. DO NOT FORGET TO ADD YOUR REFERNCES TO THE .BIB FILE. EXAMPLE: [WIRTH2000crips] GENERATES THE FOLLOWING CITATION:} [@wirth2000crisp] \textcolor{red}{ WE SHOULD REMOVE THIS LINE IN THE END.} 
 
 # Data \label{Sec:Data}
 
 ## Original Data
 
+Analyzing the \textit{Hotel booking demand} data set available in [Kaggle](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand)The raw dataset comprises 32 columns and 119,390 rows, with 12 columns being categorical and the rest numerical. Each row represents a unique booking record, containing booking dates, length of stay, number of guests, booking platforms, meal plan types, and other information. Table \ref{tbl:DataDesc} details each variable in the dataset. 
+\clearpage 
+
+\begin{table}[ht]\label{tbl:DataDesc}
+\centering
+\caption{Data Description}
+\begin{small}
+\begin{tabularx}{\textwidth}{l|l|X}
+\hline
+\textbf{Variable}     & \textbf{Date Type}   & \textbf{Description} \\
+\hline
+ADR& \textit{Numeric}     & Average Daily Rate   \\
+Adults                & \textit{Integer}     & Number of adults     \\
+Agents                & \textit{Categorical} & ID of the travel agency that made the booking  \\
+ArrivalDateDayOfMonth & \textit{Integer}     & Day of the month of the arrival date    \\
+ArrivalDateMonth      & \textit{Categorical} & Month of arrival date with 12 categories: “January” to “December”  \\
+ArrivalDateWeekNumber & \textit{Integer}     & Week number of the arrival date         \\
+ArrivalDateYear  & \textit{Integer}     & Year of arrival date \\
+AssignedRoomType & \textit{Categorical} & Code for the type of room assigned to the booking. Sometimes the assigned room type differs from the reserved room type due to hotel operation reasons (e.g. overbooking) or by customer request. Code is presented instead of designation for anonymity reasons \\
+Babies                & \textit{Integer}     & Number of babies     \\
+BookingChanges   & \textit{Integer}     & Number of changes/amendments made to the booking from the moment the booking was entered on the PMS until the moment of check-in or cancellation          \\
+Children              & \textit{Integer}     & Number of children   \\
+Company               & \textit{Categorical} & ID of the company/entity that made the booking or responsible for paying the booking. ID is presented instead of designation for anonymity reasons        \\
+Country               & \textit{Categorical} & Country of origin. ISO 3155-3:2013 format  \\
+CustomerType          & \textit{Categorical} & Type of booking, assuming one of four categories: Contract - when the booking has an allotment or other type of contract associated to it; Group – when the booking is associated to a group; Transient – when the booking is not part of a group or contract, and is not associated to other transient booking; Transient-party – when the booking is transient, but is associated to at least other transient booking   \\
+DaysInWaitingList     & \textit{Integer}     & Number of days the booking was confirmed     \\
+DepositType           & \textit{Categorical} & Indication on if the customer made a deposit to guarantee the booking. This variable can assume three categories: No Deposit; Non Refund; Refundable      \\
+DistributionChannel   & \textit{Categorical} & Booking distribution channel. The term “TA” means “Travel Agents” and “TO” means “Tour Operators”  \\
+IsCanceled            & \textit{Categorical} & Value indicating if the booking was BO canceled (1) or not (0)    \\
+IsRepeatedGuest  & \textit{Categorical} & Value indicating if the booking name was from a repeated guest (1) or not (0) \\
+LeadTime              & \textit{Integer}     & Number of days that elapsed between the entering date of the booking into the PMS and the arrival date  \\
+MarketSegment         & \textit{Categorical} & Market segment designation. In categories, the term “TA” means “Travel Agents” and “TO” means “Tour Operators”      \\
+Meal                  & \textit{Categorical} & Type of meal booked. Categories are presented in standard hospitality meal packages: Undeﬁned/SC – no meal package; BB – Bed \& Breakfast; HB – Half board (breakfast and one other meal – usually dinner); FB – Full board (breakfast, lunch and dinner)  \\
+PreviousBookingsNotCanceled              & \textit{Integer}     & Number of previous bookings not canceled by the customer prior to the current booking  \\
+PreviousCancellations & \textit{Integer}     & Number of previous bookings that were canceled by the customer prior to the current booking      \\
+RequiredCardParkingSpaces                & \textit{Integer}     & Number of car parking spaces required by the customer      \\
+ReservationStatus     & \textit{Categorical} & Reservation last status, assuming one of three categories: Canceled – booking was canceled by the customer; Check-Out – customer has checked in but already departed; No-Show – customer did not check-in and did inform the hotel of the reason why     \\
+ReservationStatusDate & \textit{Date}        & Date at which the last status was set. This variable can be used in conjunction with the ReservationStatus to understand when was the booking canceled or when did the customer checked-out of the hotel           \\
+ReservedRoomType      & \textit{Categorical} & Code of room type reserved. Code is presented instead of designation for anonymity reasons       \\
+StaysInWeekendNights  & \textit{Integer}     & Number of weekend nights (Saturday or Sunday) the guest stayed or booked to stay at the hotel    \\
+StaysInWeekNights     & \textit{Integer}     & Number of week nights (Monday to Fri-day) the guest stayed or booked to stay at the hotel        \\
+TotalOfSpecialRequests& \textit{Integer}     & Number of special requests made by the customer (e.g. twin bed or high ﬂoor) \\
+\hline
+\end{tabularx}
+\end{small}
+\end{table}
+\clearpage 
+
+To explore the data, we calculated descriptive statistics and created visualizations to illustrate the structure and distribution of our dataset. Four of the columns have missing values. The "children" column has four missing values, while the "country" column has 488 missing values. The "agent" column has 16,340 missing values, accounting for around 14\% of the total rows. The "company" column has 112,593 missing values, indicating that the majority of rows lack company information.
+
+It is important to note that some categorical variables in the data have an excessively large number of classes or categories. One-hot encoding these variables would result in an unwieldy and expensive data set with a vast number of dimensions. Table \ref{tbl:CatVars} shows the number of categories in each variable.
+
+\begin{table}[ht]
+\caption{Number of Categories per Variable}
+\label{tbl:CatVars}
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Categorical Variable} & \textbf{\# of Categories} \\
+\hline
+arrival\_date\_month          & 12                        \\
+assigned\_room\_type          & 12                        \\
+country                       & 177                       \\
+customer\_type                & 4                         \\
+deposit\_type                 & 3                         \\
+distribution\_channel         & 5 \\
+hotel                         & 2 \\
+market\_segment               & 8 \\
+meal                          & 5                         \\
+reservation\_status           & 3                         \\
+reservation\_status\_date     & 926                       \\
+reserved\_room\_type          & 10                       \\
+\hline
+\end{tabular}
+\end{table}
 
 ## EDA 
 
-<!--KIRAN'S-->
+Upon cleaning and one-hot encoding the raw data, we have the following findings: 
 
-<!--ELEN'S -->
+1. We didn’t find strong correlation between the variables (see Figure \ref{fig:CorrPlot}).
 
-<!--WENCHENG'S  -->
+![\label{fig:CorrPlot}Correlation Plot](../00_Img/CorrPlot.png){width=75%}
 
-<!--ALE'S-->
+2. The percentage of repeated guests that cancel reservations (17%) is considerably lower than the percentage of first-time customers that end up canceling the hotel booking (61%). 
 
-## Data Cleaning \& Feature Engineering 
+3. For guests that opt for a non refundable booking, there is a surprisingly high proportion of cancellations in comparison to non cancellations. This phenomenon appears to challenge the notion that the absence of a refund would generally discourage cancellations. (See Table \ref{tbl:CatsPerVar})
+
+\begin{table}[ht]
+\caption{Number of Categories per Variable}
+\centering
+\label{tbl:CatsPerVar}
+\begin{tabular}{llll}
+\hline
+\textbf{is\_canceled} & \textbf{No Deposit} &\textbf{Non Refund} & \textbf{Refundable} \\
+\hline
+0 & 74947 & 93 & 126\\
+1 & 29694 & 14494 & 36 \\
+\hline
+\end{tabular}
+\end{table}
+
+4. A large majority of the guests are of Portuguese descent which matches general intuition considering the notion that the data reflect hotels based in Portugal. Furthermore, other common countries of origin are mostly from neighboring countries including the UK, France, and Spain (see Figure \ref{fig:country}).
+
+![\label{fig:country}Top 20 Countries of Origin](../00_Img/Country.png){width=50%}
+
+
+5. Individual and family stays constitute a large majority of the data; on the other hand, contract and group reservations appear to be far less prominent. (see Figure \ref{fig:CustomerType})
+
+![\label{fig:CustomerType}Customer Type Distribution](../00_Img/CustomerType.png){width=50%}
+
+\clearpage 
+
+6. Bookings with a considerably large number of adults all appear to have been canceled. The graph also hints at potential outliers in the count of adults included in the reservation (see Figure \ref{fig:AdultsBoxplot}).
+
+![\label{fig:AdultsBoxplot}Adult distribution by cancellation.](../00_Img/AdultsBoxplot.png){width=55%}
+
+7. The number of days a reservation is held in the waiting list is typically not too long and appears reasonable from a transactional standpoint. However, there are instances where the number of days a reservation was held in the waiting list prior to confirmation was considerably long (see Figure \ref{fig:daysWaiting})
+
+![\label{fig:daysWaiting}Days in waiting list.](../00_Img/DaysWaitList.png){width=55%}
+
+8. Aggregating the bookings by arrival date, a clear pattern of seasonality can be observed from the data: the demand for hotel bookings surges during the summers and winters (see Figure \ref{fig:arrivalDate} and Figure \ref{fig:arrivalMonth}).
+
+\clearpage 
+
+![\label{fig:arrivalDate}Number of Bookings for each Arrival Date.](../00_Img/ArrivalDate.png){width=50%}
+
+![\label{fig:arrivalMonth}Number of Bookings for each Arrival Month](../00_Img/ArrivalMonth.png){width=55%}
+
+9. The duration of stays variables are highly right-skewed. From Table \ref{tbl:lengthStay} we can see that there are some bookings with very large outliers, while the majority of the stays last between 1 and 5 days. If we bin the columns, we observe roughly 46 rows with stays greater than 20 days.
+
+\begin{table}[ht]
+\caption{Length of stay in days.}
+\label{tbl:lengthStay}
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Class} & \textbf{Count}  \\
+\hline
+0-5 & 114537\\
+6-10 & 4451\\
+11-15 & 245\\
+16.20 & 111\\
+$>$20 & 46 \\
+\hline
+\end{tabular}
+\end{table}
+
+\clearpage 
+
+10. There does not appear to be a meaningful difference in the mean number of stays and composition of guests between canceled and not canceled reservations (see Table \ref{tbl:GuestComp}).
+
+\begin{table}[ht]
+\caption{Number of stays in week days and guest composition.}
+\centering
+\label{tbl:GuestComp}
+\begin{tabular}{l|l|lll}
+\hline
+\textbf{is\_canceled} & \textbf{Stays in week nights} & \textbf{Adults} & \textbf{Children} & \textbf{Babies}\\
+\hline
+0 & 2.4640 & 1.8297 & 0.1023 & 0.0103\\
+1 & 2.5619 & 1.9017 & 0.1065 & 0.0038\\
+\hline
+\end{tabular}
+\end{table}
+
+
+## Data Cleaning, Transformations \& Feature Engineering 
 
 <!--KIRAN'S-->
 
@@ -70,6 +225,8 @@ The rest of the report is structured as follows. Section \ref{Sec:Data} presents
 # Modelling\label{Sec:Modelling}
 
 ## Train, Test \& Cross Validation
+
+To be able to buld and test the predictive power of the different models, we randomly divided the data into train and test sets making sure to keep the proportion of cancellations in both of them. The train set has 95,511 observations and the test set has a total of 23,877 observations. For each model, we use 10-fold cross validation to find the optimal hyperparameters (if needed), we then retrain the optimal model using the entire training set and asses its predictive power using the test set. To assess the effectiveness of each model, we used accuracy, F-1 score, AUC score and ROC.
 
 ## Naive Bayes (benchmark)
 
