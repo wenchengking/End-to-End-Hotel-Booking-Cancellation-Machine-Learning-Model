@@ -1,0 +1,200 @@
+---
+title: "MSIA410_Proj_GAM"
+output: html_document
+date: "2023-03-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+
+library('readxl')
+library('boot')
+library('knitr')
+library('car')
+library('dplyr')
+library('nnet')
+library('rpart')
+library('ALEPlot')
+library('MASS')
+library('tidyverse')
+library('yaImpute')
+library('mgcv')
+library('gbm')
+library('randomForest')
+
+CVInd <- function(n,K) { 
+  # n is sample size; K is number of parts; 
+  # returns K-length list of indices for each part
+  m<-floor(n/K) #approximate size of each part
+  r<-n-m*K
+  I<-sample(n,n) #random reordering of the indices
+  Ind<-list() #will be list of indices for all K parts
+  length(Ind)<-K
+  for (k in 1:K) {
+    if (k <= r) kpart <- ((m+1)*(k-1)+1):((m+1)*k)
+    else kpart<-((m+1)*r+m*(k-r-1)+1):((m+1)*r+m*(k-r))
+    Ind[[k]] <- I[kpart] #indices for kth part of data
+  }
+  Ind
+}
+```
+
+## Including Plots
+
+```{r pressure, echo=FALSE}
+df = as.data.frame(read.csv('/Users/kiranjyothisheena/Documents/Kiran_Files/PA2/Project/hotel_bookings_clean.csv'))
+##
+train_index = read.csv('/Users/kiranjyothisheena/Documents/Kiran_Files/PA2/Project/msia420_project/02_Data/train_index.csv')
+train_index= train_index[,'Train_Index']
+#df_2 = df[,c("adults","log_lead_time","previous_cancellations","previous_bookings","total_of_special_requests","arrival_#month","booked_by_agent","booked_by_company","continent","is_canceled")]
+```
+
+Let us look at the different unique values that each feature can take.
+
+```{r}
+apply(df,2,function(x) nlevels(as.factor(x)))
+```
+
+We convert the relevant categorical features into factor type variables.
+
+```{r}
+df$hotel=as.factor(df$hotel)
+#df$is_canceled=as.factor(df$is_canceled)
+#df$arrival_date_year=as.factor(df$arrival_date_year)
+df$children=as.factor(df$children)
+df$babies=as.factor(df$babies)
+df$meal=as.factor(df$meal)
+df$market_segment=as.factor(df$market_segment)
+df$is_repeated_guest=as.factor(df$is_repeated_guest)
+df$deposit_type=as.factor(df$deposit_type)
+df$customer_type=as.factor(df$customer_type)
+df$total_of_special_requests=as.factor(df$total_of_special_requests)
+df$arrival_month=as.factor(df$arrival_month)
+df$domestic=as.factor(df$domestic)
+df$continent=as.factor(df$continent)
+df$got_room_booked=as.factor(df$got_room_booked)
+df$booked_by_agent=as.factor(df$booked_by_agent)
+df$booked_by_company=as.factor(df$booked_by_company)
+df$required_car_parking=as.factor(df$required_car_parking)
+```
+
+Data is split into train and test.
+
+```{r}
+train_df = df[train_index,]
+test_df = df[-train_index,]
+```
+
+```{r}
+list_of_std_var = c("arrival_date_year","adults","previous_cancellations","booking_changes",
+                    "log_lead_time","total_nights","previous_bookings",
+                    "log_days_in_waiting_list","log_adr")
+mean_val = sapply(train_df[,list_of_std_var], function(x) mean(x))
+sd_val = sapply(train_df[,list_of_std_var], function(x) sd(x))
+
+for(iter in 1:length(list_of_std_var)){
+  train_df[,list_of_std_var[iter]] = (train_df[,list_of_std_var[iter]] - mean_val[iter])/sd_val[iter]
+  test_df[,list_of_std_var[iter]] = (test_df[,list_of_std_var[iter]] - mean_val[iter])/sd_val[iter]
+}
+
+```
+
+The variables children, babies and market segment had too many factors due to which the GAM model was not able to fit the data on cross validation and test data set. Hence they were removed. The variables adults, previous_cancellations, booking_changes, log_lead_time,total_nights,previous_bookings,log_days_in_waiting_list and log_adr were treated as smoothened features. arrival_date_year could not be introduced as a continuous variable due to less number of distinct values in the data.
+
+```{r}
+gam_test1 = gam(is_canceled~s(adults) +s(previous_cancellations) +s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings) +s(log_days_in_waiting_list) +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company + required_car_parking, data=train_df,family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML') 
+```
+
+```{r}
+summary(gam_test1)
+```
+
+We can notice that atleast one variables related to a any factor feature is significant except for required_car_parking. We could try removing it from the dataset.
+
+```{r}
+gam_test1_b = gam(is_canceled~s(adults) +s(previous_cancellations) +s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings) +s(log_days_in_waiting_list) +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company, data=train_df,family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML') 
+
+summary(gam_test1_b)
+```
+
+```{r}
+n = nrow(test_df)
+check_predict = predict(gam_test1_b,test_df,type='response')
+y = test_df$is_canceled
+check_predict[check_predict> 0.5]=1;check_predict[check_predict < 0.5]=0;
+misclass_5b=sum(y != check_predict)/n
+print(paste0('The accuracy on the test data is ',1-misclass_5b))
+```
+
+```{r}
+par(mfrow=c(2,4))
+plot(gam_test1_b,scale=0,rug=T,jit = T)
+```
+
+The component graphs showcases some interesting insights. The effect of adults on the probability of cancellation is almost constant but the confidence interval of the effect gets wider as the number of adults increases. This implies the effect of adults is ambiguous. The same can be observed for the predictor previous_cancellations.
+
+On the other hand, if you consider the predictor log_days_in_waiting_list, the range of the component function values is very less compared to other predictors.
+
+```{r}
+gam_test2 = gam(is_canceled~ s(log_days_in_waiting_list) + s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings)  +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company  , data=train_df,family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML')
+
+summary(gam_test2)
+```
+
+```{r}
+n = nrow(test_df)
+check_predict = predict(gam_test2,test_df,type='response')
+y = test_df$is_canceled
+check_predict[check_predict> 0.5]=1;check_predict[check_predict < 0.5]=0;
+misclass_5b=sum(y != check_predict)/n
+print(paste0('The accuracy on the test data is ',1-misclass_5b))
+```
+
+```{r}
+plot(gam_test2,scale=0,rug=T,jit = T)
+```
+
+We can observe that the test accuracy has increased slightly. The analysis of the component graphs reveals a periodic pattern in the impact of predictors such as booking_changes, previous_bookings, and log_adr on the probability of cancellation, where high values of these predictors alternate between increasing and decreasing the probability of cancellation at regular intervals.log_lead_time reveals to have a constant increasing effect on the cancellation probability. A increase in total_nights seem to showcase a decreasing trend at higher values but we have less number of points at that range to come to a conclusion.
+
+
+
+```{r}
+
+n=nrow(train_df)
+
+Nrep<-1 #number of replicates of CV
+K<-5  #K-fold CV on each replicate
+
+
+n.models = 1
+
+y<-df$is_canceled
+
+yhat_5b=matrix(0,n,n.models) 
+misclass_5b<-matrix(0,Nrep,n.models)
+
+for (j in 1:Nrep) {
+  Ind<-CVInd(n,K)
+  for (k in 1:K) {
+    
+        
+        out_5b<-gam(is_canceled~ s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings)  +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company + required_car_parking , data=train_df[-Ind[[k]],],family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML')
+        
+        check_predict = predict(out_5b,train_df[Ind[[k]],],type='response')
+
+        yhat_5b[Ind[[k]],1]<-check_predict
+  
+        
+
+  }
+  yhat_5b[yhat_5b > 0.5]=1;yhat_5b[yhat_5b < 0.5]=0;
+  misclass_5b[j,]=apply(yhat_5b,2,function(x) sum(y != x)/n)
+} #end of j loop
+
+
+cvAve_5b<- apply(misclass_5b,2,mean); 
+print(paste0('The cross validation misclass rate is ',round(cvAve_5b,3)))
+```
