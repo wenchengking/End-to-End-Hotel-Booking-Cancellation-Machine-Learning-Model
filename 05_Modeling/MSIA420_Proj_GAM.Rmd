@@ -23,7 +23,9 @@ library('tidyverse')
 library('yaImpute')
 library('mgcv')
 library('gbm')
+library('caret')
 library('randomForest')
+library('pROC')
 
 CVInd <- function(n,K) { 
   # n is sample size; K is number of parts; 
@@ -42,7 +44,7 @@ CVInd <- function(n,K) {
 }
 ```
 
-## Including Plots
+
 
 ```{r pressure, echo=FALSE}
 df = as.data.frame(read.csv('/Users/kiranjyothisheena/Documents/Kiran_Files/PA2/Project/hotel_bookings_clean.csv'))
@@ -115,9 +117,16 @@ summary(gam_test1)
 We can notice that atleast one variables related to a any factor feature is significant except for required_car_parking. We could try removing it from the dataset.
 
 ```{r}
+start_time <- Sys.time()
+
 gam_test1_b = gam(is_canceled~s(adults) +s(previous_cancellations) +s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings) +s(log_days_in_waiting_list) +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company, data=train_df,family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML') 
 
+end_time = Sys.time()
 summary(gam_test1_b)
+```
+
+```{r}
+print(paste0('Runtime is ',(end_time-start_time)))
 ```
 
 ```{r}
@@ -130,71 +139,32 @@ print(paste0('The accuracy on the test data is ',1-misclass_5b))
 ```
 
 ```{r}
+#confusionMatrix(factor(check_predict,levels = c(0,1)),factor(y,levels = c(0,1)),positive = "1")
+cm1 = confusionMatrix(data=factor(check_predict),reference = factor(y),positive = "1")
+cm1
+print(paste0('Precision is ',cm1$byClass['Precision']))
+print(paste0('Recall is ',cm1$byClass['Recall']))
+print(paste0('Specificity is ',cm1$byClass['Specificity']))
+print(paste0('F1 is ',cm1$byClass['F1']))
+```
+
+```{r}
+auc(y, check_predict)
+```
+
+```{r}
 par(mfrow=c(2,4))
 plot(gam_test1_b,scale=0,rug=T,jit = T)
 ```
 
-The component graphs showcases some interesting insights. The effect of adults on the probability of cancellation is almost constant but the confidence interval of the effect gets wider as the number of adults increases. This implies the effect of adults is ambiguous. The same can be observed for the predictor previous_cancellations.
-
-On the other hand, if you consider the predictor log_days_in_waiting_list, the range of the component function values is very less compared to other predictors.
-
-```{r}
-gam_test2 = gam(is_canceled~ s(log_days_in_waiting_list) + s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings)  +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company  , data=train_df,family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML')
-
-summary(gam_test2)
-```
-
-```{r}
-n = nrow(test_df)
-check_predict = predict(gam_test2,test_df,type='response')
-y = test_df$is_canceled
-check_predict[check_predict> 0.5]=1;check_predict[check_predict < 0.5]=0;
-misclass_5b=sum(y != check_predict)/n
-print(paste0('The accuracy on the test data is ',1-misclass_5b))
-```
-
-```{r}
-plot(gam_test2,scale=0,rug=T,jit = T)
-```
-
-We can observe that the test accuracy has increased slightly. The analysis of the component graphs reveals a periodic pattern in the impact of predictors such as booking_changes, previous_bookings, and log_adr on the probability of cancellation, where high values of these predictors alternate between increasing and decreasing the probability of cancellation at regular intervals.log_lead_time reveals to have a constant increasing effect on the cancellation probability. A increase in total_nights seem to showcase a decreasing trend at higher values but we have less number of points at that range to come to a conclusion.
 
 
-
-```{r}
-
-n=nrow(train_df)
-
-Nrep<-1 #number of replicates of CV
-K<-5  #K-fold CV on each replicate
+The component graphs showcases some interesting insights. The effect of adults on the probability of cancellation is almost constant but the confidence interval of the effect gets wider as the number of adults increases. This implies the effect of adults is ambiguous. The same can be observed for the predictor previous_cancellations. A periodic pattern is also revealed on the impact of predictors such as booking_changes, previous_bookings, and log_adr on the probability of cancellation, where high values of these predictors alternate between increasing and decreasing the probability of cancellation at regular intervals.log_lead_time reveals to have a constant increasing effect on the cancellation probability. A increase in total_nights seem to showcase a decreasing trend at higher values but we have less number of points at that range to come to a conclusion.
 
 
-n.models = 1
-
-y<-df$is_canceled
-
-yhat_5b=matrix(0,n,n.models) 
-misclass_5b<-matrix(0,Nrep,n.models)
-
-for (j in 1:Nrep) {
-  Ind<-CVInd(n,K)
-  for (k in 1:K) {
-    
-        
-        out_5b<-gam(is_canceled~ s(booking_changes) +s(log_lead_time) +s(total_nights) +s(previous_bookings)  +s(log_adr) +hotel  + meal + is_repeated_guest + deposit_type + customer_type + total_of_special_requests + arrival_month + domestic + continent + got_room_booked + booked_by_agent + booked_by_company + required_car_parking , data=train_df[-Ind[[k]],],family=binomial,sp=c(-1,-1,-1,-1,-1,-1,-1,-1),method = 'ML')
-        
-        check_predict = predict(out_5b,train_df[Ind[[k]],],type='response')
-
-        yhat_5b[Ind[[k]],1]<-check_predict
-  
-        
-
-  }
-  yhat_5b[yhat_5b > 0.5]=1;yhat_5b[yhat_5b < 0.5]=0;
-  misclass_5b[j,]=apply(yhat_5b,2,function(x) sum(y != x)/n)
-} #end of j loop
-
-
-cvAve_5b<- apply(misclass_5b,2,mean); 
-print(paste0('The cross validation misclass rate is ',round(cvAve_5b,3)))
-```
+From the range of values of the component graphs, we can observe that top 5 effective predictors are
+1) previous\_bookings
+2) log\_lead_time
+3) log\_adr
+4) total\_nights
+5) log\_days\_in\_waiting_list
