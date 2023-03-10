@@ -23,7 +23,7 @@ abstract: 'This report details the findings of a class project for MSiA 420, whi
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
 ```
 
 \clearpage
@@ -284,6 +284,7 @@ Hence we ran a second set of hyperparameters for tuning with alpha = [0.0001,0.0
 
 ![\label{fig:mainEffectsNNet}ALE plots for final neural network](../00_Img/NN_ALE_1.png){width=90%}
 
+\clearpage
 Babies and log\_days\_in\_waiting\_list do not have a lot of distinct values and is mostly dominated by a single value which is 0. So they do not produce an ALE plot. Children,arrival\_date\_year,booking\_changes and total\_nights do not seem to have a significant effect on the target based on the range of values present on the ALE plot values. 
 
 The top 5 features which influence the values are as follows: i) previous\_cancellations, ii) log\_lead\_time, iii) log\_adr, iv) adults, and v) previous\_bookings. Considering the top 5 features, previous\_cancellations,log\_adr and previous\_bookings have a linear effect on the outcome. previous\_cancellations have an increasing effect on the probability of cancellations while adults and previous\_bookings have a decreasing effect on the probability. log\_lead\_time and log\_adr have a non-linear increasing effect on the probability. The effect of log\_adr almost seems quadratic. We can infer that maybe someone who has cancelled a lot previously have a higher probability to cancel again. A booking with a higher lead time could also have a higher probability of cancelling as there is a higher chance of their plans to change due to a large window of time between booking and arrival.
@@ -311,6 +312,7 @@ The second-degree ALE plots in Figure \ref{fig:interactionsTree} for 'log_lead_t
 
 Using the test data set, we made predictions and calculated the performance metrics for our decision tree model. The results showed an accuracy of 84%, an F-1 score of 77%, and an AUC score of 81.9%.
 
+\clearpage
 ## Nearest Neighboors
 
 The data set "hotel_bookings_dummy" was used for the K-Nearest Neighbor model, and we standardized the data. To determine the optimal value of k, we performed 5-fold cross-validation on the training data. A grid search was conducted on values of k ranging from 1 to 40, and the KNN model achieved the highest cross-validation accuracy (lowest misclassification rate) with k = 6 (see Figure \ref{fig:knnSelection}).
@@ -323,9 +325,9 @@ Once we determined the optimal value of k, we proceeded to find the six nearest 
 
 From analyzing the ALE plots, see Figure \ref{fig:knnALE1}, we identified the five most important numeric variables as the number of adults, previous cancellations, lead time, number of special requests, and number of nights staying at the hotel. The predictor "adults" had a positive linear effect, "previous_cancellations" had a positive linear effect, "log_lead_time" had an almost linear and positive effect, "total_of_special_requests" had a non-linear and negative effect, and "total_nights" had a non-linear and somewhat quadratic effect (positive at first, then negative).
 
-![\label{fig:interactionKNN}2nd Order Effects with K-NN](../00_Img/KNN_ALE_2.png){width=95%}
-
 Next Figure \ref{fig:interactionKNN} shows the generated second-degree ALE plots for the top three most relevant numerical variables. These plots showed that the effect of 'adults' was dependent on 'previous\_cancellations' and 'log\_lead\_time', while the effect of 'log\_lead\_time' was also dependent on 'previous\_cancellations'. The ALE plots showed that the interaction effect between 'previous\_cancellations' and 'log\_lead\_time' is actually not very significant, but the other two interaction effects are. Interestingly, it seems at higher values of adults, extremely low and high values of lead_time increases the probability of cancellation while intermediate values decreases the probability.
+
+![\label{fig:interactionKNN}2nd Order Effects with K-NN](../00_Img/KNN_ALE_2.png){width=95%}
 
 After comparing the predicted cancellation label class with the actual label in the test set, we found that the best KNN model with k = 6 achieved an accuracy of 86.1\%, an AUC score of 83.8\%, and an F-1 score of 80.0%.
 
@@ -393,6 +395,7 @@ Figure \ref{fig:componentGraph} presents the component graphs of the obtained GA
 
 \underline{Note:} PPR and LOESS models cannot be used for classification and hence were not considered for our analysis.
 
+\clearpage 
 ## Boosting (XGBoost)
 
 For the XGBoost model, we used the 'hotel_bookings_ohe.csv' data set. As XGBoost is a decision tree-based model, we did not standardize the data. Through 10-fold cross-validation, we tuned the hyperparameters 'learning_rate', 'max_depth', and 'n_estimators' and found the best values to be 0.1, 7, and 200 respectively.
@@ -403,8 +406,9 @@ We then fit the best model to the entire training set and interpreted it using t
 
 Figure \ref{fig:mainEffectsXGB} shows the first-degree ALE plot shows that the effect of the predictor 'previous\_cancellations' is positive and linear, the effect of 'total_of_special_requests' is negative and nonlinear, the effect of 'booking_changes' is negative and linear, the effect of 'arrival\_date\_year' is positive and linear and the effect of previous_bookings is negative and linear.
 
-![\label{fig:mainEffectsXGB}First-Degree ALE Plots for XGBoost](../00_Img/XGBoost_ALE_1.png){width=95%}
+![\label{fig:mainEffectsXGB}First-Degree ALE Plots for XGBoost](../00_Img/XGBoost_ALE_1.png){width=90%}
 
+\clearpage
 Upon examining the second degree ALE plots, Figure \ref{fig:interactionXGB}, we discovered interaction effects between 'previous\_cancellations', 'arrival\_date\_year', and 'total\_of\_special\_requests'. These predictors' effects on the cancellation probability are interdependent and rely on each other. However, the ALE plots also showed that the interaction effects between 'previous\_cancellations' and 'special\_requests' are insignificant comparing to the main effects of the two predictors.
 
 ![\label{fig:interactionXGB}Second-Degree ALE Plots for XGBoost](../00_Img/XGBoost_ALE_2.png){width=90%}
@@ -429,8 +433,6 @@ After this, we retrained the model using the entire training set. The training t
 
 Figure \ref{fig:mainEffectsRF} shows the main effects for the top 6 most important numerical variables (note that no main effects were plotted for categorical variables given the ohe version of the data set). For the variables leading time of booking, the average daily price, the total number of special requests and total number of nights the effect is non-linear and it increases as the value of the variable increases, except for number of special requests where it decreases. Additionally, we can observe that the number of previous cancellations and the arrival date year have a linear positive effect in the response. This result is intuitive for the number of previous cancellations, if you normally cancel, there is a high chance that you will cancel again.
 
-\clearpage
-
 ![\label{fig:mainEffectsRF}Main Effects for Top 6 Numerical Varaiables with Random Forest](../00_Img/MainEffectsRF.png){width=90%}
 
 Figure \ref{fig:interactionsRF} shows the interaction (second order effects) for the top three variables. As can be observed, there are strong interactions between all of them. For example, higher values of lead time (booked with many time in advanced) at a small average daily rate has a higher impact on cancellations, while higher values of lead time but with higher average daily rate has a lower impact on cancellations. Similarly, a higher number of special requests has a different impact on cancellations depending on the lead time of booking and the average daily rate.
@@ -444,8 +446,6 @@ Finally we used the test set to evaluate the model. Random Forest reaches the fo
 We used the data set "hotel_bookings_dummy" for the SVM model. Similar to KNN, we employed 10-fold cross-validation to tune the hyperparameters C, kernel type, gamma, and class\_weight. Through cross-validation, we determined that the best set of parameters were $C = 0.1$, $class\_weight = None$, $gamma = 0.1$ and  $kernel = rbf$. With these hyperparameters, we trained the SVM model with the entire training data set. The training process was computationally intensive, taking 59 seconds to complete.
 
 To evaluate the importance of the numerical predictors, we generated first-degree ALE plots for each of them as shown in Figure \ref{fig:ALE1SVM}. The plots revealed that the most important numerical predictors were 'log\_lead\_time', 'total\_of_special\_requests', 'adults', 'total\_nights', and 'log\_adr'. The variable "log\_lead\_time" exhibited a positive, nearly linear effect, while "total\_of\_special\_requests" displayed a negative, linear effect. "Adults" had a non-linear, quadratic effect that was initially negative before becoming positive, "total\_nights" had a positive, almost-linear effect, and "log\_adr" had a somewhat quadratic, non-linear effect that was initially positive before becoming negative.
-
-\clearpage
 
 ![\label{fig:ALE1SVM}Main Effects With ALE Plots for SVM](../00_Img/SVM_ALE_1.png){width=95%}
 
@@ -496,12 +496,10 @@ Although class imbalance was not a huge issue, with roughly 36% of the label cla
 
 Based on Table \ref{tbl:FeatureImportanceSummary}, the most common important features for booking cancellations were the lead time of each booking, the total number of special requests, the number of nights, the number of adults, and the number of previous cancellations. However, it is important to note that for some algorithms without a built-in method of importance, categorical features may not appear, as ALE plots used in the analysis do not plot anything for categorical variables.
 
-
-\clearpage 
-
 \begin{table}[h]
 \caption{Most Important Features Accross Methods}
 \centering
+\begin{small}
 \label{tbl:FeatureImportanceSummary}
 \begin{tabular}{lc}
 \hline
@@ -523,14 +521,19 @@ days\_in\_wait\_list & 1 \\
 number\_booking\_changes & 1 \\
 \hline
 \end{tabular}
+\end{small}
 \end{table}
 
+\clearpage 
 # Final Remarks\label{Sec:Remarks}
 
 Through this project we applied supervised-learning classification models to study hotel booking cancellations. First, we performed an exploratory data analysis, cleaned and transformed the predictors and created three different versions of our data set: *clean* (numerical and categorical variables), *dummy* (numerical, each categorical feature with k categories is represented with k-1 dummy variables) and *ohe* (numerical, each categorical feature with k categories is represented with k dummy variables). Each model used a specific version of the data depending on its requirements and characteristics, and the data sets were randomly split into train and test, and the same splits were used across models. We then developed nine ML models to predict hotel booking cancellations, using Naive Bayes as our benchmark method. Specifically, we considered Naive Bayes classifier, Logistic Regression, Neural Network, Tree, k-Nearest Neighbors, GAM, XGBoost, Random Forest and Support Vector Machines, where SVM was an additional model not studied in class. We tuned and trained every model using cross validation for the training set, and assessed the predictive powers of the models using the test set. The performance metrics used were missclassification rates, accuracies, F1 Scores and AUC scores. After analyzing the data, we found that the Random Forest model was the best fit with a test accuracy of 88.3\%. The Neural Network and XGBoost models closely followed, achieving test accuracies of over 87\% each. Notably, XGBoost had the fastest training time among these three models, being 10 times faster than Neural Networks and 3 times faster than Random Forest. This could be a crucial consideration from a business standpoint, as accurate predictions may be required daily, with the need for model retraining every week or at a higher frequency for all hotels in the chain. Therefore, the trade-off of sacrificing a mere 0.013 accuracy to reduce training time to one third is worth it and can significantly impact hotel management and resource allocation, ultimately translating into more profit for the hotel.
 
-\clearpage 
+# References 
 
+<div id="refs"></div>
+
+\clearpage
 # Appendix 
 
 ## Original Data Set Description
@@ -701,6 +704,3 @@ required\_car\_parking1      &  -8.766e+01 & 8.697e+05 &  0.000 &0.999920    \\
 \end{tabular}
 \end{footnotesize}
 \end{table}
-
-\clearpage
-# References
