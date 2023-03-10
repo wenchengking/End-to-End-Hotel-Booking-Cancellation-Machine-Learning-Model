@@ -202,7 +202,7 @@ After this, we retrained the model using the entire training set. The training t
 
 To assess the variable importance, we ploted the main effects for all numerical variables. Figure \ref{fig:mainEffectsLogistic} shows the main effects for the top 6 most important numerical variables based on the range of the y-axis (note that no main effects were plotted for categorical variables given the dummy version of the data set) which are number of previous cancellations (*previous\_cancellations*), lead time of booking (*log\_lead\_time*), number of adults (*adults*), total number of special requests (*total\_of\_special\_requests*), number of children (*children*) and total number of nights of stay (*total\_nights*). Most of the important variables show a linear effect on the cancellations, except for the lead time booking, which is not surprising giving that logistic regression is a linear model, therefore would prioritize linear relations.Additionally, all the effects are positive except for number of special requests (i.e. the more requests, the less likely a customer is to cancel). 
 
-![\label{fig:mainEffectsLogistic}Main Effects for Top 6 Numerical Varaiables with Random Forest](../00_Img/MainEffectsLogistic.png){width=95%}
+![\label{fig:mainEffectsLogistic}Main Effects for Top 6 Numerical Varaiables with Logistic Regression](../00_Img/MainEffectsLogistic.png){width=80%}
 
 \clearpage 
 
@@ -268,7 +268,7 @@ Figure \ref{fig:interactionsLogistic} shows the interaction (second order effect
 
 \clearpage
 
-![\label{fig:interactionsLogistic}Second Order Effects for Top 3 Numerical Variables with Random Forest](../00_Img/InteractionsLogistic.png){width=90%}
+![\label{fig:interactionsLogistic}Second Order Effects for Top 3 Numerical Variables with Logistic Regression](../00_Img/InteractionsLogistic.png){width=90%}
 
 Finally we used the test set to evaluate the model. Logistic regression with Ridge regularization achieves the following metrics: $miss-class\;rate = 0.173$, $accuracy = 0.827$, $F1\;score =0.74$ and $AUC = 0.90$. 
 
@@ -315,19 +315,17 @@ Using the test data set, we made predictions and calculated the performance metr
 
 The data set "hotel_bookings_dummy" was used for the K-Nearest Neighbor model, and we standardized the data. To determine the optimal value of k, we performed 5-fold cross-validation on the training data. A grid search was conducted on values of k ranging from 1 to 40, and the KNN model achieved the highest cross-validation accuracy (lowest misclassification rate) with k = 6 (see Figure \ref{fig:knnSelection}).
 
-\clearpage 
-
 ![\label{fig:knnSelection}K-NN Selection](../00_Img/KNN_K_Selection.png){width=95%}
 
 Once we determined the optimal value of k, we proceeded to find the six nearest neighbors in the training set for each row in the test set predictors. We then calculated the predicted class for the test set. Since KNN is a truly non-parametric method, there was no model to train. We timed the process of predicting the class label for the test set and noted the duration.
 
+![\label{fig:knnALE1}Main Effects with ALE plots for K-NN](../00_Img/KNN_ALE_1.png){width=95%}
+
 From analyzing the ALE plots, see Figure \ref{fig:knnALE1}, we identified the five most important numeric variables as the number of adults, previous cancellations, lead time, number of special requests, and number of nights staying at the hotel. The predictor "adults" had a positive linear effect, "previous_cancellations" had a positive linear effect, "log_lead_time" had an almost linear and positive effect, "total_of_special_requests" had a non-linear and negative effect, and "total_nights" had a non-linear and somewhat quadratic effect (positive at first, then negative).
 
-![\label{fig:knnALE1}Main Effects with ALE plots for K-NN](../00_Img/KNN_ALE_1.png){width=95%}  
+![\label{fig:interactionKNN}2nd Order Effects with K-NN](../00_Img/KNN_ALE_2.png){width=95%}
 
 Next Figure \ref{fig:interactionKNN} shows the generated second-degree ALE plots for the top three most relevant numerical variables. These plots showed that the effect of 'adults' was dependent on 'previous\_cancellations' and 'log\_lead\_time', while the effect of 'log\_lead\_time' was also dependent on 'previous\_cancellations'. The ALE plots showed that the interaction effect between 'previous\_cancellations' and 'log\_lead\_time' is actually not very significant, but the other two interaction effects are. Interestingly, it seems at higher values of adults, extremely low and high values of lead_time increases the probability of cancellation while intermediate values decreases the probability.
-
-![\label{fig:interactionKNN}2nd Order Effects with K-NN](../00_Img/KNN_ALE_2.png){width=95%}
 
 After comparing the predicted cancellation label class with the actual label in the test set, we found that the best KNN model with k = 6 achieved an accuracy of 86.1\%, an AUC score of 83.8\%, and an F-1 score of 80.0%.
 
@@ -389,9 +387,9 @@ booked\_by\_company1          & -1.495e-01  & 6.925e-02 & -2.158  &0.03089 *\\
 
 Table \ref{tbl:ParamCoeffGAM} in Appendix shows the estimated coefficients for the parametric part of the model. We can notice that at least one category of every categorical feature is significant except for *required\_car\_parking*. We re-estimated the model removing this variable. Table \ref{tbl:ParamCoeffGAM2} shows the final estimates, achieving a test set accuracy of 81.3%. The GAM model was computationally intensive to fit, taking almost 5 minutes to complete the training process.
 
-Figure \ref{fig:componentGraph} presents the component graphs of the obtained GAM model. The effect of adults on the probability of cancellation is almost constant but the confidence interval of the effect gets wider as the number of adults increases. This implies the effect of adults is ambiguous. The same can be observed for the predictor previous_cancellations. A periodic pattern is also revealed on the impact of predictors such as booking_changes, previous_bookings, and log_adr on the probability of cancellation, where high values of these predictors alternate between increasing and decreasing the probability of cancellation at regular intervals.log_lead_time reveals to have a constant increasing effect on the cancellation probability. A increase in total_nights seem to showcase a decreasing trend at higher values but we have less number of points at that range to come to a conclusion. From the range of values of the component graphs, we can observe that top 5 effective predictors are: i) previous\_bookings, ii) log\_lead_time, iii) log\_adr, iv) total\_nights, and v)log\_days\_in\_waiting_list. Since GAM is an additive model on the component functions of each of the features, we do not expect the model to showcase interactive effects between the features.
+![\label{fig:componentGraph}Component Graph](../00_Img/GAM_graph_1.png){width=80%}
 
-![\label{fig:componentGraph}Component Graph](../00_Img/GAM_graph_1.png){width=90%}
+Figure \ref{fig:componentGraph} presents the component graphs of the obtained GAM model. The effect of adults on the probability of cancellation is almost constant but the confidence interval of the effect gets wider as the number of adults increases. This implies the effect of adults is ambiguous. The same can be observed for the predictor previous_cancellations. A periodic pattern is also revealed on the impact of predictors such as booking_changes, previous_bookings, and log_adr on the probability of cancellation, where high values of these predictors alternate between increasing and decreasing the probability of cancellation at regular intervals.log_lead_time reveals to have a constant increasing effect on the cancellation probability. A increase in total_nights seem to showcase a decreasing trend at higher values but we have less number of points at that range to come to a conclusion. From the range of values of the component graphs, we can observe that top 5 effective predictors are: i) previous\_bookings, ii) log\_lead_time, iii) log\_adr, iv) total\_nights, and v)log\_days\_in\_waiting_list. Since GAM is an additive model on the component functions of each of the features, we do not expect the model to showcase interactive effects between the features.
 
 \underline{Note:} PPR and LOESS models cannot be used for classification and hence were not considered for our analysis.
 
@@ -401,8 +399,6 @@ For the XGBoost model, we used the 'hotel_bookings_ohe.csv' data set. As XGBoost
 
 We then fit the best model to the entire training set and interpreted it using the variable importance measures built-in to the model shown in Figure \ref{fig:varImpXGB}. The top 5 variables are 'deposit\_type\_Non\_Refund', 'required\_car\_parking 1", 'market\_segment\_Online TA', 'previous_cancellations' and 'domestic'. We visualized the importance of these variables through a variable importance plot and analyzed the Average Local Effects (ALE) plot and second-degree ALE plot for the numerical predictors.
 
-\clearpage 
-
 ![\label{fig:varImpXGB}Variable Importance Plot for XGBoost](../00_Img/XGBoost_VarImportance.png){width=75%}
 
 Figure \ref{fig:mainEffectsXGB} shows the first-degree ALE plot shows that the effect of the predictor 'previous\_cancellations' is positive and linear, the effect of 'total_of_special_requests' is negative and nonlinear, the effect of 'booking_changes' is negative and linear, the effect of 'arrival\_date\_year' is positive and linear and the effect of previous_bookings is negative and linear.
@@ -410,8 +406,6 @@ Figure \ref{fig:mainEffectsXGB} shows the first-degree ALE plot shows that the e
 ![\label{fig:mainEffectsXGB}First-Degree ALE Plots for XGBoost](../00_Img/XGBoost_ALE_1.png){width=95%}
 
 Upon examining the second degree ALE plots, Figure \ref{fig:interactionXGB}, we discovered interaction effects between 'previous\_cancellations', 'arrival\_date\_year', and 'total\_of\_special\_requests'. These predictors' effects on the cancellation probability are interdependent and rely on each other. However, the ALE plots also showed that the interaction effects between 'previous\_cancellations' and 'special\_requests' are insignificant comparing to the main effects of the two predictors.
-
-\clearpage 
 
 ![\label{fig:interactionXGB}Second-Degree ALE Plots for XGBoost](../00_Img/XGBoost_ALE_2.png){width=90%}
 
@@ -477,7 +471,7 @@ Table \ref{tbl:comparisonMods} shows the wide range of performances across the 9
 Model & Accuracy & Missclass & F-1 & AUC & Training & Top 5 Important \\
 & & & Score & & Time (s) & Features \\
 \hline
-Random Forest & 0.883 & 0.117 & 0.832 & 0.950 & 19.5 & log lead time, log adr,total of special requests, total nights, previous cancellations\\ 
+Random Forest & 0.883 & 0.117 & 0.832 & 0.950 & 19.5 & log lead time, deposit type, log adr, total of special requests, domestic\\ 
 \hline
 Neural Network & 0.872 & 0.128 & 0.824 & 0.859 & 60.9 & previous cancellations, log lead time, log adr, adults, previous bookings\\ 
 \hline
@@ -500,7 +494,7 @@ SVM & 0.564 & 0.436 & 0.606 & 0.635 & 59.4 & log lead time, total of special req
 
 Although class imbalance was not a huge issue, with roughly 36% of the label class being 1, the ROC AUC metric showed that the runner-up to Random Forest was actually the logistic regression model. Another dimension to consider was the computational expense of the models, indicated by the training time. Our results table revealed that the training time values varied dramatically. Naive Bayes and Decision Tree models took less than a second to train, while logistic regression took 150 seconds. Among the top performers, Random Forest took roughly 19 seconds to train, which was relatively fast, and XGBoost was even faster, delivering a test accuracy of 87\% in less than 6 seconds. On the other hand, SVM was the worst performing model, taking almost 60 seconds to train, which exhibited an incredibly low ROI.
 
-Based on Table \ref{tbl:FeatureImportanceSummary}, the most common important features for booking cancellations were the lead time of each booking, the total number of special requests, the average daily rate, the number of previous cancellations, and the number of adults. However, it is important to note that for some algorithms without a built-in method of importance, categorical features may not appear, as ALE plots used in the analysis do not plot anything for categorical variables.
+Based on Table \ref{tbl:FeatureImportanceSummary}, the most common important features for booking cancellations were the lead time of each booking, the total number of special requests, the number of nights, the number of adults, and the number of previous cancellations. However, it is important to note that for some algorithms without a built-in method of importance, categorical features may not appear, as ALE plots used in the analysis do not plot anything for categorical variables.
 
 
 \clearpage 
@@ -515,15 +509,15 @@ Feature & No. Appearences \\
 \hline
 log\_lead\_time & 6 \\
 total\_of\_special\_requests & 6 \\
-total\_nights & 6 \\
-previous\_cancellations & 5 \\
+total\_nights & 5 \\
 adults & 5 \\
+previous\_cancellations & 4 \\
 log\_adr & 4 \\
+deposit\_type & 3 \\
+domestic & 3 \\
 previous\_bookings & 2 \\
-deposit\_type & 2 \\
 required\_car\_parking & 2 \\
 market\_segment & 2 \\
-domestic & 2 \\
 children & 1 \\
 days\_in\_wait\_list & 1 \\
 number\_booking\_changes & 1 \\
